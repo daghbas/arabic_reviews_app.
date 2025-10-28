@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ texts['title'] }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        accent: '#f97316'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div class="container mx-auto px-4 py-10 max-w-5xl">
+        <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold">{{ texts['title'] }}</h1>
+                <p class="text-slate-300">{{ texts['description'] }}</p>
+            </div>
+            <nav class="flex gap-2">
+                <a href="?lang=ar" class="px-3 py-1 rounded border border-slate-700 hover:bg-slate-800">العربية</a>
+                <a href="?lang=en" class="px-3 py-1 rounded border border-slate-700 hover:bg-slate-800">English</a>
+            </nav>
+        </header>
+        {% if sample_mode %}
+            <div class="bg-amber-500/20 border border-amber-400 text-amber-200 p-4 rounded mb-6">
+                {{ texts['missing_keys'] }}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
