@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% set page_title = 'Create account' %}
+{% set page_description = 'Launch your workspace with a secure, role-ready account.' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-slate-900/60 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+    <h2 class="text-2xl font-semibold mb-2">Create your account</h2>
+    <p class="text-sm text-slate-400 mb-6">Set up credentials to access bilingual review intelligence.</p>
+    <form method="post" class="grid grid-cols-1 gap-6">
+        <div>
+            <label class="block text-sm font-medium mb-2" for="username">Username</label>
+            <input id="username" name="username" type="text" required minlength="3"
+                   class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                   placeholder="yourname">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2" for="email">Email address</label>
+            <input id="email" name="email" type="email" required
+                   class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                   placeholder="you@example.com">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-2" for="password">Password</label>
+                <input id="password" name="password" type="password" required minlength="8"
+                       class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                       placeholder="At least 8 characters">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" for="confirm_password">Confirm password</label>
+                <input id="confirm_password" name="confirm_password" type="password" required minlength="8"
+                       class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+        </div>
+        <button type="submit"
+                class="w-full py-3 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition">
+            Create account
+        </button>
+    </form>
+    <p class="text-sm text-slate-400 mt-6 text-center">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}" class="text-primary hover:underline">Sign in</a>
+    </p>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="{{ url_for('main.analyze') }}" method="post" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 space-y-6 shadow-2xl">
+    <div class="grid gap-6 md:grid-cols-2">
+        <div>
+            <label class="block text-sm font-semibold mb-2">{{ texts['source_label'] }}</label>
+            <select name="source" class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="google">{{ texts['source_google'] }}</option>
+                <option value="salla">{{ texts['source_salla'] }}</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-semibold mb-2">{{ texts['method_label'] }}</label>
+            <select name="method" class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="api">{{ texts['method_api'] }}</option>
+                <option value="scrape">{{ texts['method_scrape'] }}</option>
+            </select>
+        </div>
+    </div>
+    <div>
+        <label class="block text-sm font-semibold mb-2">{{ texts['identifier_label'] }}</label>
+        <input type="text" name="identifier" placeholder="ChIJN1t_tDeuEmsRUsoyG83frY4" class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+    </div>
+    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg transition">
+        {{ texts['submit'] }}
+    </button>
+</form>
+{% endblock %}

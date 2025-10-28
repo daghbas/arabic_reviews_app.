@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% set page_title = 'Profile settings' %}
+{% set page_description = 'Manage your identity, security, and language preferences.' %}
+
+{% block content %}
+<div class="grid gap-6 md:grid-cols-3">
+    <section class="md:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <h2 class="text-xl font-semibold mb-1">Profile overview</h2>
+        <p class="text-sm text-slate-400 mb-6">Keep your credentials and workspace aligned.</p>
+        <dl class="space-y-4">
+            <div>
+                <dt class="text-xs uppercase tracking-wide text-slate-500">Username</dt>
+                <dd class="text-lg">{{ current_user.username }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs uppercase tracking-wide text-slate-500">Email</dt>
+                <dd class="text-lg">{{ current_user.email }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs uppercase tracking-wide text-slate-500">Role</dt>
+                <dd class="text-lg capitalize">{{ current_user.role }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs uppercase tracking-wide text-slate-500">Email verification</dt>
+                <dd class="text-lg">{{ 'Verified' if current_user.email_confirmed else 'Pending verification' }}</dd>
+            </div>
+        </dl>
+        <div class="mt-8 flex flex-wrap gap-3">
+            <button id="changePasswordBtn" class="px-4 py-2 rounded-lg border border-primary text-primary hover:bg-primary/10 transition">Change password</button>
+        </div>
+    </section>
+
+    <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-8">
+        <div>
+            <h3 class="text-lg font-semibold mb-2">Language preference</h3>
+            <p class="text-sm text-slate-400 mb-4">Prepare your account for additional locales.</p>
+            <form method="post" class="space-y-4">
+                <input type="hidden" name="action" value="update_locale">
+                <label class="block text-sm font-medium" for="locale">Interface language</label>
+                <select id="locale" name="locale" class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3">
+                    <option value="en" {% if current_user.locale == 'en' %}selected{% endif %}>English</option>
+                    <option value="ar" {% if current_user.locale == 'ar' %}selected{% endif %}>العربية</option>
+                </select>
+                <button type="submit" class="w-full py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition">Save preference</button>
+            </form>
+        </div>
+        <div class="border-t border-slate-800 pt-6">
+            <h3 class="text-lg font-semibold mb-2 text-rose-300">Delete account</h3>
+            <p class="text-sm text-slate-400 mb-4">Remove your profile and data from this environment. This action cannot be undone.</p>
+            <form method="post" onsubmit="return confirm('Are you sure you want to delete your account?');" class="space-y-4">
+                <input type="hidden" name="action" value="delete_account">
+                <label class="block text-sm font-medium" for="delete_password">Confirm with password</label>
+                <input id="delete_password" name="password" type="password" required
+                       class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                <button type="submit" class="w-full py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition">Delete my account</button>
+            </form>
+        </div>
+    </section>
+</div>
+
+<div id="changePasswordModal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center z-50">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 w-full max-w-lg relative">
+        <button onclick="togglePasswordModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+        <h3 class="text-xl font-semibold mb-4">Update password</h3>
+        <form method="post" action="{{ url_for('auth.change_password') }}" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-2" for="current_password">Current password</label>
+                <input id="current_password" name="current_password" type="password" required
+                       class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" for="new_password">New password</label>
+                <input id="new_password" name="new_password" type="password" required minlength="8"
+                       class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" for="confirm_password">Confirm new password</label>
+                <input id="confirm_password" name="confirm_password" type="password" required minlength="8"
+                       class="w-full rounded-lg bg-slate-950/40 border border-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="togglePasswordModal()" class="px-4 py-2 border border-slate-600 rounded-lg hover:bg-slate-800 transition">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const modal = document.getElementById('changePasswordModal');
+    document.getElementById('changePasswordBtn')?.addEventListener('click', togglePasswordModal);
+    function togglePasswordModal() {
+        modal.classList.toggle('hidden');
+    }
+</script>
+{% endblock %}

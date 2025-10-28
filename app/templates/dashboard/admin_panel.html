@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% set page_title = 'Admin control center' %}
+{% set page_description = 'Govern accounts, roles, and access in one secure panel.' %}
+
+{% block content %}
+<div class="grid gap-6 xl:grid-cols-3">
+    <section class="xl:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-semibold">User directory</h2>
+                <p class="text-sm text-slate-400">Search, filter, and manage every account.</p>
+            </div>
+            <form method="get" class="flex flex-wrap gap-3 items-center">
+                <input type="text" name="q" value="{{ search }}" placeholder="Search users" class="bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-2">
+                <select name="role" class="bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-2">
+                    <option value="">All roles</option>
+                    {% for role in roles %}
+                        <option value="{{ role }}" {% if role_filter == role %}selected{% endif %}>{{ role|capitalize }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition">Apply</button>
+            </form>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-800">
+                <thead>
+                    <tr class="text-left text-xs uppercase tracking-wide text-slate-400">
+                        <th class="px-4 py-3">Username</th>
+                        <th class="px-4 py-3">Email</th>
+                        <th class="px-4 py-3">Role</th>
+                        <th class="px-4 py-3">Verified</th>
+                        <th class="px-4 py-3">Created</th>
+                        <th class="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800 text-sm">
+                    {% for user in users %}
+                        <tr class="hover:bg-slate-900/80">
+                            <td class="px-4 py-3 font-medium">{{ user.username }}</td>
+                            <td class="px-4 py-3 text-slate-300">{{ user.email }}</td>
+                            <td class="px-4 py-3 capitalize">{{ user.role }}</td>
+                            <td class="px-4 py-3">{{ 'Yes' if user.email_confirmed else 'No' }}</td>
+                            <td class="px-4 py-3">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-4 py-3 text-right">
+                                {% if user.id != current_user.id %}
+                                    <form method="post" class="inline">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <button type="submit" class="px-3 py-1 rounded border border-rose-500 text-rose-300 hover:bg-rose-500/10 transition">Delete</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-xs text-slate-500">Current admin</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-4 py-6 text-center text-slate-400">No users found with the current filters.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <h3 class="text-xl font-semibold mb-3">Add a new user</h3>
+        <p class="text-sm text-slate-400 mb-6">Create fully provisioned accounts with predefined roles.</p>
+        <form method="post" class="space-y-4">
+            <input type="hidden" name="action" value="create">
+            <div>
+                <label class="block text-sm font-medium mb-2" for="new_username">Username</label>
+                <input id="new_username" name="username" type="text" required class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" for="new_email">Email</label>
+                <input id="new_email" name="email" type="email" required class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" for="new_password">Temporary password</label>
+                <input id="new_password" name="password" type="password" minlength="8" required class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" for="new_role">Role</label>
+                <select id="new_role" name="role" class="w-full bg-slate-950/40 border border-slate-700 rounded-lg px-4 py-3">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="analyst">Analyst</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full py-3 rounded-lg bg-primary text-white hover:bg-primary/90 transition">Create user</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

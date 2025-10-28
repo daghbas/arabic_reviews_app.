@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'en' }}" dir="{{ 'rtl' if (lang or 'en') == 'ar' else 'ltr' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title or (texts['title'] if texts else 'Review Intelligence Portal') }}</title>
+    <meta name="description" content="{{ page_description or (texts['description'] if texts else 'AI-powered review intelligence') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        accent: '#f97316'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div class="container mx-auto px-4 py-10 max-w-6xl">
+        <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div>
+                <a href="{{ url_for('dashboard.user_home') }}" class="flex items-center gap-2">
+                    <span class="text-3xl font-bold">Aurora Reviews Hub</span>
+                </a>
+                <p class="text-slate-300">Unified review intelligence &amp; account management.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                {% if texts %}
+                    <nav class="flex gap-2">
+                        <a href="?lang=ar" class="px-3 py-1 rounded border border-slate-700 hover:bg-slate-800">العربية</a>
+                        <a href="?lang=en" class="px-3 py-1 rounded border border-slate-700 hover:bg-slate-800">English</a>
+                    </nav>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                    <div class="relative">
+                        <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="flex items-center gap-2 px-3 py-2 bg-slate-800 rounded-lg border border-slate-700 hover:border-primary transition">
+                            <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-primary font-semibold uppercase">{{ current_user.username[:2] }}</span>
+                            <div class="text-left">
+                                <p class="text-sm text-slate-300">{{ current_user.username }}</p>
+                                <p class="text-xs text-slate-400">{{ current_user.role|capitalize }}</p>
+                            </div>
+                        </button>
+                        <div class="hidden absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-700 rounded-lg shadow-lg">
+                            <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 hover:bg-slate-800">Profile</a>
+                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 hover:bg-slate-800">Sign out</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition">Sign in</a>
+                {% endif %}
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="space-y-3 mb-6">
+                    {% for category, message in messages %}
+                        {% set styles = {
+                            'success': 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200',
+                            'error': 'border-rose-500/40 bg-rose-500/10 text-rose-200',
+                            'warning': 'border-amber-500/40 bg-amber-500/10 text-amber-200',
+                            'info': 'border-sky-500/40 bg-sky-500/10 text-sky-200'
+                        } %}
+                        <div class="border rounded-lg px-4 py-3 text-sm {{ styles.get(category, styles['info']) }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if sample_mode %}
+            <div class="bg-amber-500/20 border border-amber-400 text-amber-200 p-4 rounded mb-6">
+                {{ texts['missing_keys'] if texts else 'API keys missing; sample data will be used.' }}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

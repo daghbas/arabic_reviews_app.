@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 space-y-8 shadow-2xl">
+    <div class="grid gap-6 md:grid-cols-2">
+        <div>
+            <h2 class="text-2xl font-semibold mb-1">{{ texts['analysis_title'] }}</h2>
+            <p class="text-slate-300 capitalize">{{ analysis.get('sentiment', 'unknown') }}</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold mb-2">{{ texts['summary'] }}</h3>
+            <p class="text-slate-300 leading-relaxed">{{ analysis.get('summary', '') }}</p>
+        </div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+            <h3 class="text-lg font-semibold mb-3">{{ texts['topics'] }}</h3>
+            <ul class="space-y-2 text-slate-300">
+                {% for topic in analysis.get('topics', []) %}
+                    <li class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2">{{ topic }}</li>
+                {% else %}
+                    <li class="text-slate-500">—</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+            <h3 class="text-lg font-semibold mb-3">{{ texts['entities'] }}</h3>
+            <ul class="space-y-2 text-slate-300">
+                {% for entity in analysis.get('entities', []) %}
+                    <li class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2">{{ entity }}</li>
+                {% else %}
+                    <li class="text-slate-500">—</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+            <h3 class="text-lg font-semibold mb-3">{{ texts['aspects'] }}</h3>
+            <ul class="space-y-2 text-slate-300">
+                {% for aspect in analysis.get('aspects', []) %}
+                    <li class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2">
+                        <span class="font-semibold">{{ aspect['name'] if aspect is mapping else aspect.name }}</span>
+                        <p class="text-sm text-slate-400">{{ aspect['description'] if aspect is mapping else aspect.description }}</p>
+                    </li>
+                {% else %}
+                    <li class="text-slate-500">—</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 mt-8 shadow-2xl">
+    <h3 class="text-lg font-semibold mb-4">{{ texts['chart_sentiment'] }}</h3>
+    <canvas id="sentimentChart"></canvas>
+</div>
+
+<div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 mt-8 shadow-2xl">
+    <h3 class="text-lg font-semibold mb-4">Reviews</h3>
+    <div class="space-y-4">
+        {% for review in reviews %}
+            <article class="border border-slate-800 bg-slate-950/50 rounded-xl p-5">
+                <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3">
+                    <span class="font-semibold">{{ review.author }}</span>
+                    <span class="text-sm text-slate-400">{{ review.time }}</span>
+                </header>
+                <p class="text-slate-300 leading-relaxed">{{ review.text }}</p>
+            </article>
+        {% else %}
+            <p class="text-slate-500">{{ texts['no_reviews'] }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    const sentiment = '{{ analysis.get("sentiment", "mixed") }}';
+    const sentimentCounts = {
+        positive: sentiment === 'positive' ? 1 : 0,
+        negative: sentiment === 'negative' ? 1 : 0,
+        neutral: sentiment === 'neutral' ? 1 : 0,
+        mixed: sentiment === 'mixed' ? 1 : 0
+    };
+
+    const ctx = document.getElementById('sentimentChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(sentimentCounts),
+                datasets: [{
+                    data: Object.values(sentimentCounts),
+                    backgroundColor: ['#22c55e', '#ef4444', '#eab308', '#38bdf8'],
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#e2e8f0'
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
